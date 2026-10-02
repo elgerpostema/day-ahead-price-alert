@@ -12,10 +12,10 @@ jobs:
 
     steps:
     - name: Code ophalen uit repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Python instellen
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: '3.14.7' # Kies een stabiele versie, 3.12/3.13 werkt uitstekend op GitHub Actions
 
