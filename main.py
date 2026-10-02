@@ -173,14 +173,17 @@ def bereken_uurprijzen_en_uitersten(data_dict):
     datum_str = gesorteerde_uren[0].strftime('%d-%m-%Y')
 
     output_lijnen = []
-    output_lijnen.append(f"📊 *Stroomprijsanalyse voor {datum_str} (Afgerond)*")
+    output_lijnen.append(f"📊 Stroomprijsanalyse voor {datum_str}")
     
     tijd_laag = f"{laagste_blok['start'].strftime('%H:%M')} tot {laagste_blok['eind'].strftime('%H:%M')}"
     output_lijnen.append(f"🟢 Goedkoopste tijdsblok: {tijd_laag} -> {laagste_blok['prijs']} ct/kWh")
     
     tijd_hoog = f"{hoogste_blok['start'].strftime('%H:%M')} tot {hoogste_blok['eind'].strftime('%H:%M')}"
-    output_lijnen.append(f"🔴 Duurste tijdsblok:     {tijd_hoog} -> {hoogste_blok['prijs']} ct/kWh\n")
-    
+    output_lijnen.append(f"🔴 Duurste tijdsblok:     {tijd_hoog} -> {hoogste_blok['prijs']} ct/kWh")
+
+    delta_prijs = round(hoogste_blok['prijs'] - laagste_blok['prijs'], 2)
+    output_lijnen.append(f"⚖️  Delta in prijs:        {delta_prijs} ct/kWh\n")
+
     limiet_afgerond = round(PRICE_LIMIT)
     has_free_electricity = False
     for blok in tijdsblokken:
