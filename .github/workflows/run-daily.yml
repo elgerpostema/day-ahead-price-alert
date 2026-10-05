@@ -3,7 +3,7 @@ name: Run Day-Ahead Price Alert
 on:
   schedule:
     # Dit triggert de actie elke dag om 14:00 UTC (15:00 NL wintertijd / 16:00 zomertijd)
-    - cron: '0 14 * * *'
+    - cron: '7 14 * * *'
   workflow_dispatch: # Dit zorgt ervoor dat je de actie ook handmatig kunt testen via de GitHub website
 
 jobs:
