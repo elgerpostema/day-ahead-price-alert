@@ -240,24 +240,65 @@ def calculate_hourly_prices(data_dict, start_local, end_local):
     print(full_message)
     send_telegram_message(full_message)
 
+def validate_environment():
+    """Validate that all required environment variables are set."""
+    required_vars = [
+        "TELEGRAM_BOT_TOKEN",
+        "TELEGRAM_CHAT_ID", 
+        "ENTSOE_API_KEY"
+    ]
+    
+    missing_vars = []
+    for var in required_vars:
+        if not os.environ.get(var):
+            missing_vars.append(var)
+    
+    if missing_vars:
+        print(f"❌ Ontbrekende omgevingsvariabelen: {', '.join(missing_vars)}")
+        print("💡 Voeg deze variabelen toe aan je .env bestand of omgeving")
+        return False
+    
+    return True
+
 # ==================== Main Execution Flow =====================================
 
 def main():
     """Execute the main program flow."""
     try:
+        # Validate environment setup
+        if not validate_environment():
+            print("❌ Fout: Vereiste omgevingsvariabelen zijn niet correct ingesteld")
+            return
+            
+        print("🚀 Start van dagelijkse prijscontrole...")
+        
         # Get time period for price fetching
         time_period = get_time_period()
+        print(f"ℹ Ophaalperiode: {time_period['period_start']} tot {time_period['period_end']}")
         
         # Fetch price data from API
+        print("📥 Bezig met ophalen van prijsdata van ENTSO-E API...")
         data_dict = fetch_day_ahead_prices(
             time_period["period_start"], 
             time_period["period_end"]
         )
         
+        if data_dict is None:
+            print("❌ Geen data ontvangen van ENTSO-E API")
+            print("💡 Tip: Zorg dat uw API-sleutel geactiveerd is voor RESTful API toegang")
+            print("💡 Stuur een e-mail naar transparency@entsoe.eu om activering te vragen")
+            return
+            
         # Process and display results
+        print("📊 Bezig met verwerken van prijsdata...")
         calculate_hourly_prices(data_dict, time_period["start_local"], time_period["end_local"])
+        
+        print("✅ Dagelijkse prijscontrole voltooid!")
+        
     except Exception as e:
-        print(f"❌ Fout in hoofdprogramma: {e}")
+        print(f"❌ Onverwachte fout in hoofdprogramma: {e}")
+        import traceback
+        traceback.print_exc()
 
 if __name__ == "__main__":
     main()
