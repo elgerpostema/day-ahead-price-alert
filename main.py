@@ -2,7 +2,7 @@ import os
 import requests
 import xmltodict
 from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -24,6 +24,8 @@ try:
 except ImportError:
     # Fallback for missing imports - set defaults
     from zoneinfo import ZoneInfo
+    from datetime import timezone
+    
     AMSTERDAM_TZ = ZoneInfo("Europe/Amsterdam")
     UTC_TZ = ZoneInfo("UTC")
 
