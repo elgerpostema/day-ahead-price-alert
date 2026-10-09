@@ -11,7 +11,7 @@ load_dotenv()
 # Import configuration
 try:
     from config import (
-        TELEGRAM_BOT_TOKEN, 
+        TELEGRAM_BOT_TOKEN,
         TELEGRAM_CHAT_ID,
         ENTSOE_API_KEY,
         ENTSOE_API_ENDPOINT,
@@ -26,7 +26,7 @@ except ImportError:
     from zoneinfo import ZoneInfo
     AMSTERDAM_TZ = ZoneInfo("Europe/Amsterdam")
     UTC_TZ = ZoneInfo("UTC")
-    
+
     TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
     TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
     ENTSOE_API_KEY = os.environ.get("ENTSOE_API_KEY")
@@ -40,21 +40,21 @@ except ImportError:
 def get_time_period():
     """Calculate the time period for price fetching based on current time."""
     now = datetime.now(AMSTERDAM_TZ)
-    
+
     # start_day => fetch the data for today + 1 (that is tomorrow)
     start_day = 1
     # if the new prices are not available, just fetch it for today
     if now.hour <= PRICE_UPDATE_HOUR:
         start_day = 0
         print("Het is vóór 15:00. Prijzen voor vandaag worden opgehaald...")
-    
+
     start_local = now.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=start_day)
     end_local = start_local + timedelta(days=1)
-    
+
     # Convert to ENTSO-E format (YYYYMMDDHHMM)
     period_start = start_local.astimezone(UTC_TZ).strftime("%Y%m%d%H%M")
     period_end = end_local.astimezone(UTC_TZ).strftime("%Y%m%d%H%M")
-    
+
     return {
         "start_local": start_local,
         "end_local": end_local,
@@ -80,11 +80,11 @@ def send_telegram_message(text):
 def fetch_day_ahead_prices(period_start, period_end):
     """
     Fetch day-ahead electricity prices from ENTSO-E API.
-    
+
     Args:
         period_start (str): Start time in ENTSO-E format
         period_end (str): End time in ENTSO-E format
-        
+
     Returns:
         dict or None: Parsed XML data or None if error occurred
     """
