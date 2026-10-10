@@ -20,8 +20,6 @@ ENTSOE_API_ENDPOINT = "https://web-api.tp.entsoe.eu/api"
 PRICE_LIMIT = -14.00
 
 # Timezone configurations
-AMSTERDAM_TZ = timezone.utc  # This will be set by the zoneinfo library in main.py
-UTC_TZ = timezone.utc
 
 # ==================== API Constants ====================
 # Domain constants for ENTSO-E API
