@@ -206,6 +206,10 @@ cython_debug/
 # Temporary file for partial code execution
 tempCodeRunnerFile.py
 
+# Vim swap files
+*.swp
+*~
+
 # Ruff stuff:
 .ruff_cache/
 
