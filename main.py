@@ -16,11 +16,15 @@ try:
         ENTSOE_API_KEY,
         ENTSOE_API_ENDPOINT,
         PRICE_LIMIT,
-        AMSTERDAM_TZ,
-        UTC_TZ,
         ENTSOE_DOMAIN,
         PRICE_UPDATE_HOUR
     )
+    
+    # Import timezone configurations - they need to be defined here too
+    from zoneinfo import ZoneInfo
+    AMSTERDAM_TZ = ZoneInfo('Europe/Amsterdam')
+    UTC_TZ = ZoneInfo('UTC')
+    
 except ImportError:
     # Fallback for missing imports - set defaults
     from zoneinfo import ZoneInfo
@@ -41,26 +45,29 @@ except ImportError:
 def get_time_period():
     """Calculate the time period for price fetching based on current time."""
     now = datetime.now(AMSTERDAM_TZ)
-
-    # start_day => fetch the data for today + 1 (that is tomorrow)
-    start_day = 1
-    # if the new prices are not available, just fetch it for today
-    if now.hour <= PRICE_UPDATE_HOUR:
-        start_day = 0
-        print("Het is vóór 15:00. Prijzen voor vandaag worden opgehaald...")
-
-    start_local = now.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=start_day)
-    end_local = start_local + timedelta(days=1)
-
-    # Convert to ENTSO-E format (YYYYMMDDHHMM)
-    period_start = start_local.astimezone(UTC_TZ).strftime("%Y%m%d%H%M")
-    period_end = end_local.astimezone(UTC_TZ).strftime("%Y%m%d%H%M")
-
+    
+    # Determine if we're before or after 15:00 Amsterdam time
+    # For ENTSO-E, prices are typically available for the current day or the next day
+    if now.hour < PRICE_UPDATE_HOUR:
+        # Before 15:00 - get today's prices (from 00:00 to 23:59)
+        start_local = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        end_local = start_local + timedelta(days=1)
+        print("ℹ Het is vóór 15:00. Prijzen voor vandaag worden opgehaald...")
+    else:
+        # After 15:00 - get tomorrow's prices (from 00:00 to 23:59)  
+        start_local = now.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
+        end_local = start_local + timedelta(days=1)
+        print("ℹ Het is na 15:00. Prijzen voor morgen worden opgehaald...")
+    
+    # Convert to UTC for API call
+    period_start = start_local.astimezone(UTC_TZ).strftime('%Y%m%d%H%M')
+    period_end = end_local.astimezone(UTC_TZ).strftime('%Y%m%d%H%M')
+    
     return {
-        "start_local": start_local,
-        "end_local": end_local,
         "period_start": period_start,
-        "period_end": period_end
+        "period_end": period_end,
+        "start_local": start_local,
+        "end_local": end_local
     }
 
 def send_telegram_message(text):
